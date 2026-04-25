@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>宅建50点奪取：Ver.2.0</title>
+    <title>宅建50点奪取：Ver.3.0</title>
     <style>
         body { font-family: sans-serif; background: #121212; color: #e0e0e0; padding: 15px; margin: 0; }
         .section-title { font-size: 0.9rem; color: #888; text-transform: uppercase; margin: 15px 0 5px 5px; border-left: 3px solid #00e5ff; padding-left: 10px; }
         .card { background: #1e1e1e; padding: 12px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        .btn { border: none; border-radius: 8px; color: white; padding: 12px 5px; font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: transform 0.1s; -webkit-tap-highlight-color: transparent; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn { border: none; border-radius: 8px; color: white; padding: 12px 5px; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: transform 0.1s; -webkit-tap-highlight-color: transparent; }
         .btn:active { transform: scale(0.95); }
-        .btn-o { background: #2e7d32; } .btn-t { background: #ef6c00; } .btn-q { background: #c62828; }
+        .btn-o { background: #2e7d32; grid-column: span 1; } .btn-t { background: #ef6c00; } .btn-q { background: #c62828; }
         .btn-audit { background: #37474f; font-size: 0.8rem; }
         .count-display { font-size: 1.1rem; display: block; margin-bottom: 3px; }
         .alert { background: #b71c1c; color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; font-size: 0.9rem; text-align: center; }
-        .msg { background: #333; padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-top: 5px; color: #ffeb3b; }
+        .msg { background: #333; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-top: 8px; color: #ffeb3b; white-space: pre-line; }
         .report-btn { background: #007bff; width: 100%; margin-top: 15px; padding: 15px; font-size: 1rem; }
         .reset-btn { background: #333; width: 100%; margin-top: 10px; padding: 8px; font-size: 0.7rem; color: #888; }
         .stat-val { font-size: 1.8rem; color: #00e5ff; font-weight: bold; }
@@ -23,10 +23,10 @@
 </head>
 <body>
 
-    <div id="status_alert" class="alert">⚠️ 入力（演習中）を始めてください</div>
+    <div id="status_alert" class="alert">⚠️ 演習を始めてポチポチして！</div>
 
     <div class="section-title">PHASE 1: 演習中（確信度）</div>
-    <div class="card grid">
+    <div class="card" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
         <button class="btn btn-o" onclick="inc('o')"><span class="count-display" id="o_v">0</span>○確信</button>
         <button class="btn btn-t" onclick="inc('t')"><span class="count-display" id="t_v">0</span>△迷い</button>
         <button class="btn btn-q" onclick="inc('q')"><span class="count-display" id="q_v">0</span>？不明</button>
@@ -34,35 +34,39 @@
 
     <div class="section-title">PHASE 2: 演習後（内訳）</div>
     <div class="card">
-        <p style="font-size: 0.75rem; margin-bottom: 8px;">【○確信】の実際の結果</p>
+        <p style="font-size: 0.75rem; margin-bottom: 8px; color: #4caf50;">【○確信】だったものの結果</p>
         <div class="grid">
-            <button class="btn btn-audit" onclick="inc('a')"><span id="a_v">0</span><br>a/b(正解)</button>
-            <button class="btn btn-audit" style="background:#b71c1c; grid-column: span 2;" onclick="inc('om')"><span id="om_v">0</span><br>○ミス (自信あったのに!)</button>
+            <button class="btn btn-audit" onclick="inc('a')"><span id="a_v">0</span><br>a/b (正解)</button>
+            <button class="btn btn-audit" style="background:#b71c1c;" onclick="inc('om')"><span id="om_v">0</span><br>○ミス (バグ)</button>
         </div>
     </div>
 
     <div class="card">
-        <p style="font-size: 0.75rem; margin-bottom: 8px;">【△？】の実際の結果</p>
-        <div class="grid">
-            <button class="btn btn-audit" style="background:#283593;" onclick="inc('lucky')"><span id="lucky_v">0</span><br>○正解</button>
-            <button class="btn btn-audit" onclick="inc('bad_x')"><span id="bad_x_v">0</span><br>×不正解</button>
-            <div id="feedback_msg" class="msg" style="grid-column: span 3; display:none;"></div>
+        <p style="font-size: 0.75rem; margin-bottom: 8px; color: #ff9800;">【△？】だったものの結果</p>
+        <div class="grid" style="margin-bottom: 8px;">
+            <button class="btn btn-audit" style="background:#283593;" onclick="inc('lucky')"><span id="lucky_v">0</span><br>ラッキー(△→○)</button>
+            <button class="btn btn-audit" style="background:#4527a0;" onclick="inc('super')"><span id="super_v">0</span><br>超ラッキー(?→○)</button>
         </div>
+        <div class="grid">
+            <button class="btn btn-audit" onclick="inc('valid_x')"><span id="valid_x_v">0</span><br>実力相応ミス(△→×)</button>
+            <button class="btn btn-audit" onclick="inc('growth')"><span id="growth_v">0</span><br>伸び代しかない(?→×)</button>
+        </div>
+        <div id="feedback_msg" class="msg" style="display:none;"></div>
     </div>
 
     <button class="btn report-btn" onclick="calculate()">分析完了</button>
-    <button class="btn reset-btn" onclick="resetAll()">全データリセット</button>
+    <button class="btn reset-btn" onclick="resetAll()">リセット</button>
 
     <div id="report_area" class="card" style="display:none; text-align: center; border-top: 3px solid #00e5ff;">
         <div class="stat-val" id="gap_res">0%</div>
-        <div style="color:#888; font-size: 0.8rem; margin-bottom: 10px;">ギャップ率（脳のズレ）</div>
+        <div style="color:#888; font-size: 0.8rem; margin-bottom: 10px;">ギャップ率（自分への誤解）</div>
         <div class="stat-val" id="mastery_res" style="color:#4caf50;">0%</div>
         <div style="color:#888; font-size: 0.8rem; margin-bottom: 15px;">実質正答率（a+b）</div>
         <button class="btn report-btn" style="background: #00e5ff; color: #000;" onclick="copyReport()">報告をコピー</button>
     </div>
 
     <script>
-        let data = { o:0, t:0, q:0, a:0, om:0, lucky:0, bad_x:0 };
+        let data = { o:0, t:0, q:0, a:0, om:0, lucky:0, super:0, valid_x:0, growth:0 };
         
         function inc(k) {
             data[k]++;
@@ -71,43 +75,43 @@
         }
 
         function updateStatus() {
-            let total_p1 = data.o + data.t + data.q;
-            let total_p2 = data.a + data.om + data.lucky + data.bad_x;
+            let t1 = data.o + data.t + data.q;
+            let t2 = data.a + data.om + data.lucky + data.super + data.valid_x + data.growth;
             let alertBox = document.getElementById('status_alert');
             let fbBox = document.getElementById('feedback_msg');
 
-            if (total_p1 === 0) {
-                alertBox.innerText = "⚠️ 演習を始めてポチポチして！";
+            if (t1 === 0) {
+                alertBox.innerText = "⚠️ 演習開始！ポチポチして！";
                 alertBox.style.background = "#b71c1c";
-            } else if (total_p1 > total_p2) {
-                alertBox.innerText = `⚠️ 内訳が ${total_p1 - total_p2} 件足りてないよ！`;
+            } else if (t1 > t2) {
+                alertBox.innerText = `⚠️ 内訳が ${t1 - t2} 件足りてないよ！`;
                 alertBox.style.background = "#ff9800";
-            } else if (total_p1 < total_p2) {
-                alertBox.innerText = "⚠️ 内訳が演習数より多いぞ！？";
+            } else if (t1 < t2) {
+                alertBox.innerText = "⚠️ 内訳が多すぎる！リセットしてやり直し！";
                 alertBox.style.background = "#f44336";
             } else {
-                alertBox.innerText = "✅ 全て入力済み。分析OK！";
+                alertBox.innerText = "✅ 入力完了。分析OK！";
                 alertBox.style.background = "#2e7d32";
             }
 
-            // フィードバック表示
-            if (data.lucky > 0 || data.bad_x > 0) {
+            let msgs = [];
+            if (data.super > 0) msgs.push("？→○：合ってると思うな！！！");
+            if (data.growth > 0 || data.valid_x > 0) msgs.push("×：そりゃそう。ちゃんと理解してインプットしよう。");
+            
+            if (msgs.length > 0) {
                 fbBox.style.display = "block";
-                let msgs = [];
-                if (data.lucky > 0) msgs.push("？→○：まぐれを実力と思うなよ！！！");
-                if (data.bad_x > 0) msgs.push("△？→×：そりゃそう。ちゃんと理解してインプットしよう。");
                 fbBox.innerText = msgs.join("\n");
             }
         }
 
         function calculate() {
             let total = data.o + data.t + data.q;
-            if (total === 0) return alert("カウントしてないぞ！");
-            if (total !== (data.a + data.om + data.lucky + data.bad_x)) {
-                return alert("入力件数がズレてる。アラートを確認して！");
+            if (total === 0) return alert("カウントしてない！");
+            if (total !== (data.a + data.om + data.lucky + data.super + data.valid_x + data.growth)) {
+                return alert("入力件数がズレてるよ！");
             }
             
-            let gap = ((data.om + data.lucky) / total * 100).toFixed(1);
+            let gap = ((data.om + data.lucky + data.super) / total * 100).toFixed(1);
             let mastery = (data.a / total * 100).toFixed(1);
 
             document.getElementById('gap_res').innerText = gap + "%";
@@ -117,7 +121,7 @@
         }
 
         function resetAll() {
-            if(confirm("リセットしていい？")) {
+            if(confirm("データをリセットする？")) {
                 Object.keys(data).forEach(k => { data[k]=0; document.getElementById(k+'_v').innerText=0; });
                 document.getElementById('report_area').style.display='none';
                 document.getElementById('feedback_msg').style.display='none';
