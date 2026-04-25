@@ -2,24 +2,32 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>宅建演習ラベリングツール：Ver.3.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>宅建50点奪取</title>
+    <link rel="apple-touch-icon" href="IMG_2202.png">
+    <link rel="icon" type="image/png" href="IMG_2202.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
-        body { font-family: sans-serif; background: #121212; color: #e0e0e0; padding: 15px; margin: 0; }
-        .section-title { font-size: 0.85rem; color: #888; text-transform: uppercase; margin: 15px 0 5px 5px; border-left: 3px solid #00e5ff; padding-left: 10px; }
-        .card { background: #1e1e1e; padding: 12px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-container { display: flex; flex-direction: column; align-items: center; }
-        .btn { border: none; border-radius: 8px; color: white; padding: 12px 5px; font-size: 0.85rem; font-weight: bold; cursor: pointer; width: 100%; -webkit-tap-highlight-color: transparent; }
-        .minus-btn { background: #444; color: #bbb; border-radius: 50%; width: 24px; height: 24px; border: none; margin-top: -10px; z-index: 10; font-size: 14px; display: flex; justify-content: center; align-items: center; }
+        /* スタイルはVer 3.1から継承 */
+        body { font-family: sans-serif; background: #121212; color: #e0e0e0; padding: 15px; margin: 0; padding-top: 5px; }
+        .section-title { font-size: 0.8rem; color: #888; text-transform: uppercase; margin: 10px 0 3px 5px; border-left: 3px solid #00e5ff; padding-left: 10px; }
+        .card { background: #1e1e1e; padding: 10px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+        .btn-container { display: flex; flex-direction: column; align-items: center; position: relative; }
+        .btn { border: none; border-radius: 8px; color: white; padding: 10px 3px; font-size: 0.8rem; font-weight: bold; cursor: pointer; width: 100%; -webkit-tap-highlight-color: transparent; }
+        .minus-btn { background: #444; color: #fff; border-radius: 50%; width: 26px; height: 26px; border: 2px solid #222; margin-top: -10px; z-index: 10; font-size: 16px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .btn-o { background: #2e7d32; } .btn-t { background: #ef6c00; } .btn-q { background: #c62828; }
-        .btn-audit { background: #37474f; }
-        .count-display { font-size: 1.1rem; display: block; margin-bottom: 3px; pointer-events: none; }
-        .alert { background: #b71c1c; color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; font-size: 0.85rem; text-align: center; }
-        .msg { background: #333; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-top: 8px; color: #ffeb3b; white-space: pre-line; }
-        .report-btn { background: #007bff; width: 100%; margin-top: 15px; padding: 15px; font-size: 1rem; color: white; border: none; border-radius: 8px; font-weight: bold; }
-        .reset-btn { background: #333; width: 100%; margin-top: 10px; padding: 8px; font-size: 0.7rem; color: #888; border: none; border-radius: 8px; }
-        .stat-val { font-size: 1.8rem; color: #00e5ff; font-weight: bold; }
+        .btn-audit { background: #37474f; font-size: 0.75rem; }
+        .count-display { font-size: 1.0rem; display: block; margin-bottom: 2px; pointer-events: none; }
+        .alert { background: #b71c1c; color: white; padding: 8px; border-radius: 8px; margin-bottom: 8px; font-weight: bold; font-size: 0.8rem; text-align: center; }
+        .msg { background: #333; padding: 8px; border-radius: 8px; font-size: 0.75rem; margin-top: 6px; color: #ffeb3b; white-space: pre-line; }
+        .report-btn { background: #007bff; width: 100%; margin-top: 10px; padding: 12px; font-size: 0.95rem; color: white; border: none; border-radius: 8px; font-weight: bold; }
+        .reset-btn { background: #333; width: 100%; margin-top: 8px; padding: 6px; font-size: 0.65rem; color: #888; border: none; border-radius: 8px; }
+        .stat-val { font-size: 1.6rem; color: #00e5ff; font-weight: bold; }
+        /* グリッドを2列に変更 */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     </style>
 </head>
 <body>
@@ -27,56 +35,56 @@
     <div id="status_alert" class="alert">⚠️ 演習開始！ポチポチして！</div>
 
     <div class="section-title">PHASE 1: 演習中（確信度）</div>
-    <div class="card" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+    <div class="card grid">
         <div class="btn-container">
             <button class="btn btn-o" onclick="inc('o')"><span class="count-display" id="o_v">0</span>○確信</button>
-            <button class="minus-btn" onclick="dec('o', event)">－</button>
+            <div class="minus-btn" onclick="dec('o', event)">－</div>
         </div>
         <div class="btn-container">
             <button class="btn btn-t" onclick="inc('t')"><span class="count-display" id="t_v">0</span>△迷い</button>
-            <button class="minus-btn" onclick="dec('t', event)">－</button>
+            <div class="minus-btn" onclick="dec('t', event)">－</div>
         </div>
         <div class="btn-container">
             <button class="btn btn-q" onclick="inc('q')"><span class="count-display" id="q_v">0</span>？不明</button>
-            <button class="minus-btn" onclick="dec('q', event)">－</button>
+            <div class="minus-btn" onclick="dec('q', event)">－</div>
         </div>
     </div>
 
     <div class="section-title">PHASE 2: 演習後（内訳）</div>
     <div class="card">
-        <p style="font-size: 0.7rem; margin-bottom: 8px; color: #4caf50;">【○確信】だったものの結果</p>
-        <div class="grid">
+        <p style="font-size: 0.65rem; margin-bottom: 6px; color: #4caf50;">【○確信】だったものの結果</p>
+        <div class="grid-2">
             <div class="btn-container">
                 <button class="btn btn-audit" onclick="inc('a')"><span id="a_v">0</span><br>a/b (正解)</button>
-                <button class="minus-btn" onclick="dec('a', event)">－</button>
+                <div class="minus-btn" onclick="dec('a', event)">－</div>
             </div>
             <div class="btn-container">
                 <button class="btn btn-audit" style="background:#b71c1c;" onclick="inc('om')"><span id="om_v">0</span><br>○ミス (バグ)</button>
-                <button class="minus-btn" onclick="dec('om', event)">－</button>
+                <div class="minus-btn" onclick="dec('om', event)">－</div>
             </div>
         </div>
     </div>
 
     <div class="card">
-        <p style="font-size: 0.7rem; margin-bottom: 8px; color: #ff9800;">【△？】だったものの結果</p>
-        <div class="grid" style="margin-bottom: 12px;">
+        <p style="font-size: 0.65rem; margin-bottom: 6px; color: #ff9800;">【△？】だったものの結果</p>
+        <div class="grid-2" style="margin-bottom: 8px;">
             <div class="btn-container">
                 <button class="btn btn-audit" style="background:#283593;" onclick="inc('lucky')"><span id="lucky_v">0</span><br>ラッキー(△→○)</button>
-                <button class="minus-btn" onclick="dec('lucky', event)">－</button>
+                <div class="minus-btn" onclick="dec('lucky', event)">－</div>
             </div>
             <div class="btn-container">
                 <button class="btn btn-audit" style="background:#4527a0;" onclick="inc('super')"><span id="super_v">0</span><br>超ラッキー(?→○)</button>
-                <button class="minus-btn" onclick="dec('super', event)">－</button>
+                <div class="minus-btn" onclick="dec('super', event)">－</div>
             </div>
         </div>
-        <div class="grid">
+        <div class="grid-2">
             <div class="btn-container">
-                <button class="btn btn-audit" onclick="inc('valid_x')"><span id="valid_x_v">0</span><br>実力相応ミス(△→×)</button>
-                <button class="minus-btn" onclick="dec('valid_x', event)">－</button>
+                <button class="btn btn-audit" onclick="inc('valid_x')"><span id="valid_x_v">0</span><br>実力ミス(△→×)</button>
+                <div class="minus-btn" onclick="dec('valid_x', event)">－</div>
             </div>
             <div class="btn-container">
-                <button class="btn btn-audit" onclick="inc('growth')"><span id="growth_v">0</span><br>伸び代しかない(?→×)</button>
-                <button class="minus-btn" onclick="dec('growth', event)">－</button>
+                <button class="btn btn-audit" onclick="inc('growth')"><span id="growth_v">0</span><br>伸び代(?→×)</button>
+                <div class="minus-btn" onclick="dec('growth', event)">－</div>
             </div>
         </div>
         <div id="feedback_msg" class="msg" style="display:none;"></div>
@@ -87,9 +95,9 @@
 
     <div id="report_area" class="card" style="display:none; text-align: center; border-top: 3px solid #00e5ff;">
         <div class="stat-val" id="gap_res">0%</div>
-        <div style="color:#888; font-size: 0.8rem; margin-bottom: 10px;">ギャップ率（自分への誤解）</div>
+        <div style="color:#888; font-size: 0.75rem; margin-bottom: 6px;">ギャップ率（自分への誤解）</div>
         <div class="stat-val" id="mastery_res" style="color:#4caf50;">0%</div>
-        <div style="color:#888; font-size: 0.8rem; margin-bottom: 15px;">実質正答率（a+b）</div>
+        <div style="color:#888; font-size: 0.75rem; margin-bottom: 10px;">実質正答率（a+b）</div>
         <button class="report-btn" style="background: #00e5ff; color: #000;" onclick="copyReport()">報告をコピー</button>
     </div>
 
@@ -103,7 +111,7 @@
         }
 
         function dec(k, e) {
-            e.stopPropagation(); // 下のボタンのクリックイベントを止める
+            e.stopPropagation();
             if (data[k] > 0) {
                 data[k]--;
                 document.getElementById(k+'_v').innerText = data[k];
@@ -149,10 +157,8 @@
             if (total !== (data.a + data.om + data.lucky + data.super + data.valid_x + data.growth)) {
                 return alert("入力件数がズレてるよ！");
             }
-            
             let gap = ((data.om + data.lucky + data.super) / total * 100).toFixed(1);
             let mastery = (data.a / total * 100).toFixed(1);
-
             document.getElementById('gap_res').innerText = gap + "%";
             document.getElementById('mastery_res').innerText = mastery + "%";
             document.getElementById('report_area').style.display = 'block';
@@ -171,7 +177,7 @@
         function copyReport() {
             let text = `【宅建報告】\nギャップ率：${document.getElementById('gap_res').innerText}\n実質正答率：${document.getElementById('mastery_res').innerText}\n(a+bの純粋な実力)`;
             navigator.clipboard.writeText(text);
-            alert("コピー完了！山口さんに送って！");
+            alert("コピー完了！山口さんに送れ！");
         }
     </script>
 </body>
