@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>宅建50点奪取</title>
+    <title>宅建演習ラベリングツール</title>
+    <meta name="apple-mobile-web-app-title" content="宅ラベ">
+    <meta name="application-name" content="宅ラベ">
+    
     <link rel="apple-touch-icon" href="IMG_2202.png">
     <link rel="icon" type="image/png" href="IMG_2202.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -133,7 +136,10 @@
         function dec(k, e) { e.stopPropagation(); if (data[k] > 0) data[k]--; updateUI(); }
 
         function updateUI() {
-            Object.keys(data).forEach(k => document.getElementById(k+'_v').innerText = data[k]);
+            Object.keys(data).forEach(k => {
+                const el = document.getElementById(k+'_v');
+                if(el) el.innerText = data[k];
+            });
             let t1 = data.o + data.t + data.q;
             let t2 = data.a + data.b + data.om + data.lucky + data.super + data.valid_x + data.growth;
             let alertBox = document.getElementById('status_alert');
@@ -184,7 +190,7 @@
         }
 
         function copyReport() {
-            let text = `【宅建報告】\nギャップ率：${document.getElementById('gap_res').innerText}\n実質正答率：${document.getElementById('mastery_res').innerText}\n(a+bの純粋な実力)`;
+            let text = `【宅ラベ報告】\nギャップ率：${document.getElementById('gap_res').innerText}\n実質正答率：${document.getElementById('mastery_res').innerText}\n(a+bの純粋な実力)`;
             navigator.clipboard.writeText(text);
             alert("コピー完了！山口さんに送れ！");
         }
