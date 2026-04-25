@@ -10,24 +10,24 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <style>
-        /* スタイルはVer 3.1から継承 */
         body { font-family: sans-serif; background: #121212; color: #e0e0e0; padding: 15px; margin: 0; padding-top: 5px; }
         .section-title { font-size: 0.8rem; color: #888; text-transform: uppercase; margin: 10px 0 3px 5px; border-left: 3px solid #00e5ff; padding-left: 10px; }
-        .card { background: #1e1e1e; padding: 10px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+        .card { background: #1e1e1e; padding: 12px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .btn-container { display: flex; flex-direction: column; align-items: center; position: relative; }
-        .btn { border: none; border-radius: 8px; color: white; padding: 10px 3px; font-size: 0.8rem; font-weight: bold; cursor: pointer; width: 100%; -webkit-tap-highlight-color: transparent; }
-        .minus-btn { background: #444; color: #fff; border-radius: 50%; width: 26px; height: 26px; border: 2px solid #222; margin-top: -10px; z-index: 10; font-size: 16px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .btn { border: none; border-radius: 8px; color: white; padding: 12px 5px; font-size: 0.85rem; font-weight: bold; cursor: pointer; width: 100%; -webkit-tap-highlight-color: transparent; outline: none; }
+        .btn:active { transform: scale(0.95); opacity: 0.8; }
+        .minus-btn { background: #444; color: #fff; border-radius: 50%; width: 28px; height: 28px; border: 2px solid #222; margin-top: -12px; z-index: 10; font-size: 18px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .btn-o { background: #2e7d32; } .btn-t { background: #ef6c00; } .btn-q { background: #c62828; }
         .btn-audit { background: #37474f; font-size: 0.75rem; }
-        .count-display { font-size: 1.0rem; display: block; margin-bottom: 2px; pointer-events: none; }
-        .alert { background: #b71c1c; color: white; padding: 8px; border-radius: 8px; margin-bottom: 8px; font-weight: bold; font-size: 0.8rem; text-align: center; }
-        .msg { background: #333; padding: 8px; border-radius: 8px; font-size: 0.75rem; margin-top: 6px; color: #ffeb3b; white-space: pre-line; }
-        .report-btn { background: #007bff; width: 100%; margin-top: 10px; padding: 12px; font-size: 0.95rem; color: white; border: none; border-radius: 8px; font-weight: bold; }
-        .reset-btn { background: #333; width: 100%; margin-top: 8px; padding: 6px; font-size: 0.65rem; color: #888; border: none; border-radius: 8px; }
-        .stat-val { font-size: 1.6rem; color: #00e5ff; font-weight: bold; }
-        /* グリッドを2列に変更 */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .count-display { font-size: 1.1rem; display: block; margin-bottom: 2px; pointer-events: none; }
+        .alert { background: #b71c1c; color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; font-size: 0.85rem; text-align: center; }
+        .msg { background: #333; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-top: 8px; color: #ffeb3b; white-space: pre-line; }
+        .report-btn { background: #007bff; width: 100%; margin-top: 15px; padding: 15px; font-size: 1rem; color: white; border: none; border-radius: 8px; font-weight: bold; }
+        .reset-btn { background: #333; width: 100%; margin-top: 10px; padding: 8px; font-size: 0.7rem; color: #888; border: none; border-radius: 8px; }
+        .stat-val { font-size: 2rem; color: #00e5ff; font-weight: bold; }
+        .label-desc { font-size: 0.6rem; font-weight: normal; opacity: 0.8; display: block; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -50,40 +50,65 @@
         </div>
     </div>
 
-    <div class="section-title">PHASE 2: 演習後（内訳）</div>
+    <div class="section-title">PHASE 2: 演習後（結果）</div>
     <div class="card">
-        <p style="font-size: 0.65rem; margin-bottom: 6px; color: #4caf50;">【○確信】だったものの結果</p>
-        <div class="grid-2">
+        <p style="font-size: 0.7rem; margin-bottom: 8px; color: #4caf50;">【○確信】だったものの内訳</p>
+        <div class="grid">
             <div class="btn-container">
-                <button class="btn btn-audit" onclick="inc('a')"><span id="a_v">0</span><br>a/b (正解)</button>
+                <button class="btn btn-audit" onclick="inc('a')">
+                    <span class="count-display" id="a_v">0</span>a (完勝)
+                    <span class="label-desc">4肢全解明</span>
+                </button>
                 <div class="minus-btn" onclick="dec('a', event)">－</div>
             </div>
             <div class="btn-container">
-                <button class="btn btn-audit" style="background:#b71c1c;" onclick="inc('om')"><span id="om_v">0</span><br>○ミス (バグ)</button>
+                <button class="btn btn-audit" onclick="inc('b')">
+                    <span class="count-display" id="b_v">0</span>b (一撃)
+                    <span class="label-desc">消去法など</span>
+                </button>
+                <div class="minus-btn" onclick="dec('b', event)">－</div>
+            </div>
+            <div class="btn-container">
+                <button class="btn btn-audit" style="background:#b71c1c;" onclick="inc('om')">
+                    <span class="count-display" id="om_v">0</span>○ミス
+                    <span class="label-desc">要バグ修正</span>
+                </button>
                 <div class="minus-btn" onclick="dec('om', event)">－</div>
             </div>
         </div>
     </div>
 
     <div class="card">
-        <p style="font-size: 0.65rem; margin-bottom: 6px; color: #ff9800;">【△？】だったものの結果</p>
-        <div class="grid-2" style="margin-bottom: 8px;">
+        <p style="font-size: 0.7rem; margin-bottom: 8px; color: #ff9800;">【△？】だったものの結果</p>
+        <div class="grid-2" style="margin-bottom: 12px;">
             <div class="btn-container">
-                <button class="btn btn-audit" style="background:#283593;" onclick="inc('lucky')"><span id="lucky_v">0</span><br>ラッキー(△→○)</button>
+                <button class="btn btn-audit" style="background:#283593;" onclick="inc('lucky')">
+                    <span class="count-display" id="lucky_v">0</span>ラッキー
+                    <span class="label-desc">△→○</span>
+                </button>
                 <div class="minus-btn" onclick="dec('lucky', event)">－</div>
             </div>
             <div class="btn-container">
-                <button class="btn btn-audit" style="background:#4527a0;" onclick="inc('super')"><span id="super_v">0</span><br>超ラッキー(?→○)</button>
+                <button class="btn btn-audit" style="background:#4527a0;" onclick="inc('super')">
+                    <span class="count-display" id="super_v">0</span>超ラッキー
+                    <span class="label-desc">？→○</span>
+                </button>
                 <div class="minus-btn" onclick="dec('super', event)">－</div>
             </div>
         </div>
         <div class="grid-2">
             <div class="btn-container">
-                <button class="btn btn-audit" onclick="inc('valid_x')"><span id="valid_x_v">0</span><br>実力ミス(△→×)</button>
+                <button class="btn btn-audit" onclick="inc('valid_x')">
+                    <span class="count-display" id="valid_x_v">0</span>実力ミス
+                    <span class="label-desc">△→×</span>
+                </button>
                 <div class="minus-btn" onclick="dec('valid_x', event)">－</div>
             </div>
             <div class="btn-container">
-                <button class="btn btn-audit" onclick="inc('growth')"><span id="growth_v">0</span><br>伸び代(?→×)</button>
+                <button class="btn btn-audit" onclick="inc('growth')">
+                    <span class="count-display" id="growth_v">0</span>伸び代
+                    <span class="label-desc">？→×</span>
+                </button>
                 <div class="minus-btn" onclick="dec('growth', event)">－</div>
             </div>
         </div>
@@ -91,37 +116,26 @@
     </div>
 
     <button class="report-btn" onclick="calculate()">分析完了</button>
-    <button class="reset-btn" onclick="resetAll()">全データリセット</button>
+    <button class="reset-btn" onclick="resetAll()">データをリセット</button>
 
     <div id="report_area" class="card" style="display:none; text-align: center; border-top: 3px solid #00e5ff;">
         <div class="stat-val" id="gap_res">0%</div>
-        <div style="color:#888; font-size: 0.75rem; margin-bottom: 6px;">ギャップ率（自分への誤解）</div>
+        <div style="color:#888; font-size: 0.8rem; margin-bottom: 10px;">ギャップ率（自分への誤解）</div>
         <div class="stat-val" id="mastery_res" style="color:#4caf50;">0%</div>
-        <div style="color:#888; font-size: 0.75rem; margin-bottom: 10px;">実質正答率（a+b）</div>
+        <div style="color:#888; font-size: 0.8rem; margin-bottom: 15px;">実質正答率（a+b）</div>
         <button class="report-btn" style="background: #00e5ff; color: #000;" onclick="copyReport()">報告をコピー</button>
     </div>
 
     <script>
-        let data = { o:0, t:0, q:0, a:0, om:0, lucky:0, super:0, valid_x:0, growth:0 };
+        let data = { o:0, t:0, q:0, a:0, b:0, om:0, lucky:0, super:0, valid_x:0, growth:0 };
         
-        function inc(k) {
-            data[k]++;
-            document.getElementById(k+'_v').innerText = data[k];
-            updateStatus();
-        }
+        function inc(k) { data[k]++; updateUI(); }
+        function dec(k, e) { e.stopPropagation(); if (data[k] > 0) data[k]--; updateUI(); }
 
-        function dec(k, e) {
-            e.stopPropagation();
-            if (data[k] > 0) {
-                data[k]--;
-                document.getElementById(k+'_v').innerText = data[k];
-                updateStatus();
-            }
-        }
-
-        function updateStatus() {
+        function updateUI() {
+            Object.keys(data).forEach(k => document.getElementById(k+'_v').innerText = data[k]);
             let t1 = data.o + data.t + data.q;
-            let t2 = data.a + data.om + data.lucky + data.super + data.valid_x + data.growth;
+            let t2 = data.a + data.b + data.om + data.lucky + data.super + data.valid_x + data.growth;
             let alertBox = document.getElementById('status_alert');
             let fbBox = document.getElementById('feedback_msg');
 
@@ -129,36 +143,32 @@
                 alertBox.innerText = "⚠️ 演習開始！ポチポチして！";
                 alertBox.style.background = "#b71c1c";
             } else if (t1 > t2) {
-                alertBox.innerText = `⚠️ 内訳が ${t1 - t2} 件足りてないよ！`;
+                alertBox.innerText = `⚠️ あと ${t1 - t2} 件の内訳を入れて！`;
                 alertBox.style.background = "#ff9800";
             } else if (t1 < t2) {
-                alertBox.innerText = `⚠️ 内訳が ${t2 - t1} 件多いぞ！`;
+                alertBox.innerText = `⚠️ 内訳が ${t2 - t1} 件多いぞ！修正して！`;
                 alertBox.style.background = "#f44336";
             } else {
-                alertBox.innerText = "✅ 入力完了。分析OK！";
+                alertBox.innerText = "✅ 全入力完了。分析して良し！";
                 alertBox.style.background = "#2e7d32";
             }
 
             let msgs = [];
             if (data.super > 0) msgs.push("？→○：合ってると思うな！！！");
             if (data.growth > 0 || data.valid_x > 0) msgs.push("×：そりゃそう。ちゃんと理解してインプットしよう。");
-            
-            if (msgs.length > 0) {
-                fbBox.style.display = "block";
-                fbBox.innerText = msgs.join("\n");
-            } else {
-                fbBox.style.display = "none";
-            }
+            fbBox.style.display = msgs.length > 0 ? "block" : "none";
+            fbBox.innerText = msgs.join("\n");
         }
 
         function calculate() {
             let total = data.o + data.t + data.q;
-            if (total === 0) return alert("カウントしてない！");
-            if (total !== (data.a + data.om + data.lucky + data.super + data.valid_x + data.growth)) {
-                return alert("入力件数がズレてるよ！");
+            if (total === 0 || total !== (data.a + data.b + data.om + data.lucky + data.super + data.valid_x + data.growth)) {
+                return alert("入力件数がズレているか、演習データがありません！");
             }
+            
             let gap = ((data.om + data.lucky + data.super) / total * 100).toFixed(1);
-            let mastery = (data.a / total * 100).toFixed(1);
+            let mastery = ((data.a + data.b) / total * 100).toFixed(1);
+
             document.getElementById('gap_res').innerText = gap + "%";
             document.getElementById('mastery_res').innerText = mastery + "%";
             document.getElementById('report_area').style.display = 'block';
@@ -166,11 +176,10 @@
         }
 
         function resetAll() {
-            if(confirm("データをリセットする？")) {
-                Object.keys(data).forEach(k => { data[k]=0; document.getElementById(k+'_v').innerText=0; });
-                document.getElementById('report_area').style.display='none';
-                document.getElementById('feedback_msg').style.display='none';
-                updateStatus();
+            if(confirm("データをリセットしますか？")) {
+                Object.keys(data).forEach(k => data[k] = 0);
+                document.getElementById('report_area').style.display = 'none';
+                updateUI();
             }
         }
 
