@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宅建：完全タップカウンター</tit
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #121212; color: #e0e0e0; padding: 15px; margin: 0; }
+        .section-title { font-size: 0.9rem; color: #888; text-transform: uppercase; margin: 20px 0 10px 5px; border-left: 3px solid #00e5ff; padding-left: 10px; }
+        .card { background: #1e1e1e; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .btn { border: none; border-radius: 8px; color: white; padding: 15px 5px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: transform 0.1s; -webkit-tap-highlight-color: transparent; }
+        .btn:active { transform: scale(0.95); }
+        .btn-o { background: #2e7d32; } .btn-t { background: #ef6c00; } .btn-q { background: #c62828; }
+        .btn-audit { background: #37474f; font-size: 0.85rem; }
+        .count-display { font-size: 1.2rem; display: block; margin-bottom: 5px; }
+        .report-btn { background: #007bff; width: 100%; margin-top: 20px; padding: 18px; font-size: 1.1rem; }
+        .reset-btn { background: #333; width: 100%; margin-top: 10px; padding: 10px; font-size: 0.8rem; color: #888; }
+        #report_area { border-top: 2px dashed #444; margin-top: 20px; padding-top: 20px; text-align: center; }
+        .stat-val { font-size: 2rem; color: #00e5ff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="section-title">PHASE 1: 演習中（確信度）</div>
+    <div class="card grid">
+        <button class="btn btn-o" onclick="inc('o')"><span class="count-display" id="o_v">0</span>○確信</button>
+        <button class="btn btn-t" onclick="inc('t')"><span class="count-display" id="t_v">0</span>△迷い</button>
+        <button class="btn btn-q" onclick="inc('q')"><span class="count-display" id="q_v">0</span>？不明</button>
+    </div>
+
+    <div class="section-title">PHASE 2: 演習後（結果の内訳）</div>
+    <div class="card">
+        <div style="margin-bottom: 15px;">
+            <p style="font-size: 0.8rem; margin-bottom: 5px;">【○確信】だったものの内訳</p>
+            <div class="grid">
+                <button class="btn btn-audit" onclick="inc('a')"><span id="a_v">0</span><br>a(完勝)</button>
+                <button class="btn btn-audit" onclick="inc('b')"><span id="b_v">0</span><br>b(不完全)</button>
+                <button class="btn btn-audit" style="background:#b71c1c;" onclick="inc('om')"><span id="om_v">0</span><br>○ミス</button>
+            </div>
+        </div>
+        <div>
+            <p style="font-size: 0.8rem; margin-bottom: 5px;">【△？】だったものの内訳</p>
+            <div class="grid">
+                <button class="btn btn-audit" style="background:#283593; grid-column: span 3;" onclick="inc('lucky')">
+                    <span id="lucky_v">0</span><br>まぐれ正解 (△? → ○)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn report-btn" onclick="calculate()">分析結果を表示</button>
+    <button class="btn reset-btn" onclick="resetAll()">リセット</button>
+
+    <div id="report_area" style="display:none;">
+        <div class="stat-val" id="gap_res">0%</div>
+        <div style="color:#888; margin-bottom: 15px;">ギャップ率（脳のズレ）</div>
+        <div class="stat-val" id="mastery_res" style="color:#4caf50;">0%</div>
+        <div style="color:#888; margin-bottom: 20px;">制圧率（aの割合）</div>
+        <button class="btn report-btn" style="background: #00e5ff; color: #000;" onclick="copyReport()">報告をコピー</button>
+    </div>
+
+    <script>
+        let data = { o:0, t:0, q:0, a:0, b:0, om:0, lucky:0 };
+        function inc(k) {
+            data[k]++;
+            document.getElementById(k+'_v').innerText = data[k];
+        }
+        function resetAll() {
+            if(confirm("データをリセットしますか？")) {
+                Object.keys(data).forEach(k => { data[k]=0; document.getElementById(k+'_v').innerText=0; });
+                document.getElementById('report_area').style.display='none';
+            }
+        }
+        function calculate() {
+            let total = data.o + data.t + data.q;
+            if(total === 0) return alert("まずは演習中のカウントをしてください");
+            
+            let gap = ((data.om + data.lucky) / total * 100).toFixed(1);
+            let mastery = (data.a / total * 100).toFixed(1);
+
+            document.getElementById('gap_res').innerText = gap + "%";
+            document.getElementById('mastery_res').innerText = mastery + "%";
+            document.getElementById('report_area').style.display = 'block';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+        function copyReport() {
+            let text = `【宅建報告】\nギャップ率：${document.getElementById('gap_res').innerText}\n制圧率(a)：${document.getElementById('mastery_res').innerText}`;
+            navigator.clipboard.writeText(text);
+            alert("コピー完了！山口さんに送信してください。");
+        }
+    </script>
+</body>
+</html>
