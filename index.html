@@ -74,6 +74,287 @@
         }
 
         // --- 以下、Ver.9.0と同じデザインとUIロジック ---
-        // (省略せずに全コードを貼り付けてください)
+        // <!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>宅建演習ラベリングツール</title>
+    <meta name="apple-mobile-web-app-title" content="宅ラベ">
+    <link rel="apple-touch-icon" href="IMG_2202.png">
+    <link rel="icon" type="image/png" href="IMG_2202.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDTvfK4bpsMXZPafP31I30_NCXv4hQ-UNY",
+            authDomain: "takken-labeling-tool.firebaseapp.com",
+            projectId: "takken-labeling-tool",
+            storageBucket: "takken-labeling-tool.firebasestorage.app",
+            messagingSenderId: "111683915060",
+            appId: "1:111683915060:web:6817eeebc88aab53f36961",
+            measurementId: "G-N0XSR446X9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        window.allData = {
+            total: createSet(), rights: createSet(), business: createSet(), laws: createSet(), tax: createSet()
+        };
+
+        function createSet() { return { o:0, t:0, q:0, a:0, b:0, om:0, lucky:0, super:0, valid_x:0, growth:0, notes: "", q_notes: "" }; }
+
+        getRedirectResult(auth).catch(err => {
+            if(err.code !== 'auth/redirect-cancelled-by-user') console.error(err);
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            const status = document.getElementById('user_status');
+            if (user) {
+                status.innerText = user.displayName;
+                document.getElementById('login_btn').style.display = 'none';
+                document.getElementById('logout_btn').style.display = 'block';
+                await loadFromServer(user.uid);
+            } else {
+                status.innerText = "未ログイン";
+                document.getElementById('login_btn').style.display = 'block';
+                document.getElementById('logout_btn').style.display = 'none';
+                loadFromLocal();
+            }
+        });
+
+        window.login = () => signInWithRedirect(auth, provider);
+        window.logout = () => signOut(auth);
+
+        window.saveData = async () => {
+            localStorage.setItem('takulabe_v90_final', JSON.stringify(window.allData));
+            const user = auth.currentUser;
+            if (user) {
+                try { await setDoc(doc(db, "users", user.uid), { allData: window.allData, lastUpdated: new Date() }); } catch(e) { console.error(e); }
+            }
+        };
+
+        function loadFromLocal() {
+            const saved = localStorage.getItem('takulabe_v90_final');
+            if (saved) window.allData = JSON.parse(saved);
+            window.updateUI();
+        }
+
+        async function loadFromServer(uid) {
+            const docSnap = await getDoc(doc(db, "users", uid));
+            if (docSnap.exists()) { window.allData = docSnap.data().allData; } else { loadFromLocal(); }
+            window.updateUI();
+        }
+
+        window.updateUI = () => {
+            if (window.currentCat === 'dash') { renderDashboard(); return; }
+            const d = window.allData[window.currentCat];
+            ['o','t','q','om','a','b','lucky','super','valid_x','growth'].forEach(k => {
+                const el = document.getElementById(k+'_v');
+                if(el) el.innerText = d[k];
+            });
+            document.getElementById('cat_notes').value = d.notes || "";
+            document.getElementById('q_notes').value = d.q_notes || "";
+            
+            const t1 = d.o + d.t + d.q;
+            const t2 = d.a + d.b + d.om + d.lucky + d.super + d.valid_x + d.growth;
+            const alertBox = document.getElementById('status_alert');
+            
+            if (t1 === 0) {
+                alertBox.innerText = "演習を開始しましょう！";
+                alertBox.className = "status-bar status-neutral";
+            } else if (t1 > t2) {
+                alertBox.innerText = `⚠️ あと ${t1 - t2} 件の内訳を入れて！`;
+                alertBox.className = "status-bar status-warning";
+            } else if (t1 < t2) {
+                alertBox.innerText = `⚠️ 内訳が ${t2 - t1} 件多いぞ！`;
+                alertBox.className = "status-bar status-danger";
+            } else {
+                alertBox.innerText = "✅ 件数一致！分析可能です";
+                alertBox.className = "status-bar status-success";
+            }
+        };
+    </script>
+
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #121212; color: #e0e0e0; padding: 15px; margin: 0; padding-bottom: 80px; }
+        .auth-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #1e1e1e; border-radius: 16px; margin-bottom: 20px; border: 1px solid #333; }
+        .login-btn { background: #00e5ff; color: #000; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; }
+        
+        .tab-container { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; position: sticky; top: 0; z-index: 100; background: #121212; padding: 10px 0; }
+        .tab { background: #2a2a2a; color: #888; border: none; padding: 12px 24px; border-radius: 16px; font-size: 0.95rem; font-weight: bold; white-space: nowrap; }
+        .tab.active { background: #00e5ff; color: #000; }
+
+        .status-bar { padding: 22px; border-radius: 20px; text-align: center; font-weight: bold; font-size: 1.1rem; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .status-neutral { background: #37474f; } .status-warning { background: #ef6c00; } .status-danger { background: #b71c1c; } .status-success { background: #2e7d32; }
+
+        .section-title { font-size: 1.1rem; color: #999; margin: 40px 0 15px 5px; border-left: 6px solid #00e5ff; padding-left: 15px; }
+        .card { background: #1e1e1e; padding: 25px; border-radius: 30px; margin-bottom: 25px; border: 1px solid #333; box-shadow: 0 12px 24px rgba(0,0,0,0.5); }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn-container { display: flex; flex-direction: column; align-items: center; position: relative; }
+        .btn { border: none; border-radius: 20px; color: white; padding: 30px 5px; font-size: 1rem; font-weight: bold; width: 100%; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .minus-btn { background: #444; color: #fff; border-radius: 50%; width: 44px; height: 44px; border: 3px solid #121212; margin-top: -22px; z-index: 10; display: flex; justify-content: center; align-items: center; font-size: 28px; }
+        .btn-o { background: #2e7d32; } .btn-t { background: #ef6c00; } .btn-q { background: #c62828; }
+        .btn-audit { background: #37474f; font-size: 1.1rem; }
+        .count-display { font-size: 2.2rem; display: block; margin-bottom: 8px; }
+        .note-area { width: 100%; background: #2a2a2a; border: 1px solid #444; border-radius: 20px; color: #fff; padding: 18px; box-sizing: border-box; font-size: 1.1rem; min-height: 120px; line-height: 1.6; margin-top: 15px; }
+        .dashboard-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 600px; }
+        .dashboard-table th, td { border: 1px solid #333; padding: 15px 10px; text-align: center; }
+        .row-total { background: #263238; font-weight: bold; color: #00e5ff; }
+        .stat-val { font-size: 3.5rem; color: #00e5ff; font-weight: bold; }
+        .report-btn { background: #007bff; width: 100%; margin-top: 35px; padding: 25px; font-size: 1.5rem; color: white; border: none; border-radius: 20px; font-weight: bold; }
+    </style>
+</head>
+<body onload="init()">
+
+    <div class="auth-bar">
+        <span id="user_status">読み込み中...</span>
+        <button id="login_btn" class="login-btn" onclick="login()">Googleログイン</button>
+        <button id="logout_btn" onclick="logout()" style="display:none; background:none; border:none; color:#777; font-size:0.8rem;">ログアウト</button>
+    </div>
+
+    <div class="tab-container">
+        <button class="tab" onclick="switchTab('dash')">📊 総合集計</button>
+        <button class="tab" onclick="switchTab('total')">全範囲</button>
+        <button class="tab" onclick="switchTab('rights')">権利関係</button>
+        <button class="tab" onclick="switchTab('business')">宅建業法</button>
+        <button class="tab" onclick="switchTab('laws')">法令上の制限</button>
+        <button class="tab" onclick="switchTab('tax')">税・その他</button>
+    </div>
+
+    <div id="view_dash" style="display:none;">
+        <div class="section-title">全分野・総計ダッシュボード</div>
+        <div class="card" style="text-align:center;">
+            <div class="stat-val" id="total_mastery">0%</div>
+            <div style="color:#888; font-size: 1.2rem; margin-bottom:25px;">トータル実質正答率 (a+b)</div>
+            <div style="overflow-x: auto; border-radius: 20px; border: 1px solid #333;">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr><th>分野</th><th>○自信</th><th>△/?</th><th>a</th><th>b</th><th>○ミス</th><th>運</th><th>a+b</th><th>率</th></tr>
+                    </thead>
+                    <tbody id="dash_body"></tbody>
+                    <tfoot id="dash_foot"></tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view_input">
+        <div id="status_alert" class="status-bar status-neutral">カテゴリを選択</div>
+        
+        <div class="section-title">PHASE 1: 演習中の感触</div>
+        <div class="card grid-3">
+            <div class="btn-container"><button class="btn btn-o" onclick="inc('o')"><span id="o_v" class="count-display">0</span>○自信</button><div class="minus-btn" onclick="dec('o', event)">－</div></div>
+            <div class="btn-container"><button class="btn btn-t" onclick="inc('t')"><span id="t_v" class="count-display">0</span>△迷い</button><div class="minus-btn" onclick="dec('t', event)">－</div></div>
+            <div class="btn-container"><button class="btn btn-q" onclick="inc('q')"><span id="q_v" class="count-display">0</span>？？不明</button><div class="minus-btn" onclick="dec('q', event)">－</div></div>
+        </div>
+
+        <div class="section-title">PHASE 2: 結果内訳（格付け）</div>
+        <div class="card">
+            <div class="btn-container" style="margin-bottom:20px;">
+                <button class="btn btn-audit" style="background:#b71c1c; padding:30px 5px;" onclick="inc('om')"><span id="om_v" class="count-display">0</span>○ミス（致命的バグ）</button>
+                <div class="minus-btn" onclick="dec('om', event)">－</div>
+            </div>
+            <textarea id="cat_notes" class="note-area" oninput="saveNotes()" placeholder="○ミスの理由をメモ！"></textarea>
+            
+            <div class="grid-2" style="margin-top:35px;">
+                <div class="btn-container"><button class="btn btn-audit" onclick="inc('a')"><span id="a_v" class="count-display">0</span>a(完勝)</button><div class="minus-btn" onclick="dec('a', event)">－</div></div>
+                <div class="btn-container"><button class="btn btn-audit" onclick="inc('b')"><span id="b_v" class="count-display">0</span>b(一撃)</button><div class="minus-btn" onclick="dec('b', event)">－</div></div>
+                <div class="btn-container"><button class="btn btn-audit" style="background:#283593;" onclick="inc('lucky')"><span id="lucky_v" class="count-display">0</span>運(△○)</button><div class="minus-btn" onclick="dec('lucky', event)">－</div></div>
+                <div class="btn-container"><button class="btn btn-audit" style="background:#4527a0;" onclick="inc('super')"><span id="super_v" class="count-display">0</span>運(?○)</button><div class="minus-btn" onclick="dec('super', event)">－</div></div>
+                <div class="btn-container"><button class="btn btn-audit" onclick="inc('valid_x')"><span id="valid_x_v" class="count-display">0</span>△×(実力)</button><div class="minus-btn" onclick="dec('valid_x', event)">－</div></div>
+                <div class="btn-container"><button class="btn btn-audit" onclick="inc('growth')"><span id="growth_v" class="count-display">0</span>?×(伸び代)</button><div class="minus-btn" onclick="dec('growth', event)">－</div></div>
+            </div>
+            <textarea id="q_notes" class="note-area" oninput="saveNotes()" placeholder="？不明や伸び代についての気づきメモ"></textarea>
+        </div>
+
+        <button class="report-btn" onclick="calculate()">分析結果を表示</button>
+        <div id="report_area" class="card" style="display:none; text-align: center; border-top: 5px solid #00e5ff;">
+            <div class="stat-val" id="res_mastery">0%</div>
+            <button class="report-btn" style="background:#00e5ff; color:#000;" onclick="copyReport()">報告をコピー</button>
+        </div>
+        <button onclick="resetCurrent()" style="background:none; border:none; color:#555; width:100%; margin-top:40px; font-size:0.85rem;">表示中のカテゴリをリセット</button>
+    </div>
+
+    <script>
+        window.currentCat = 'dash';
+        const catNames = { total:'全範囲', rights:'権利関係', business:'宅建業法', laws:'法令上の制限', tax:'税・その他' };
+
+        function init() { switchTab('dash'); }
+
+        function switchTab(cat) {
+            window.currentCat = cat;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const activeTab = document.querySelector(`[onclick="switchTab('${cat}')"]`);
+            if (activeTab) activeTab.classList.add('active');
+            if (cat === 'dash') {
+                document.getElementById('view_dash').style.display = 'block';
+                document.getElementById('view_input').style.display = 'none';
+                renderDashboard();
+            } else {
+                document.getElementById('view_dash').style.display = 'none';
+                document.getElementById('view_input').style.display = 'block';
+                document.getElementById('report_area').style.display = 'none';
+                window.updateUI();
+            }
+        }
+
+        function inc(k) { window.allData[window.currentCat][k]++; window.updateUI(); window.saveData(); }
+        function dec(k, e) { e.stopPropagation(); if (window.allData[window.currentCat][k] > 0) window.allData[window.currentCat][k]--; window.updateUI(); window.saveData(); }
+        function saveNotes() { 
+            window.allData[window.currentCat].notes = document.getElementById('cat_notes').value; 
+            window.allData[window.currentCat].q_notes = document.getElementById('q_notes').value;
+            window.saveData(); 
+        }
+
+        function renderDashboard() {
+            const body = document.getElementById('dash_body');
+            const foot = document.getElementById('dash_foot');
+            body.innerHTML = ""; foot.innerHTML = "";
+            let s = { o:0, tq:0, a:0, b:0, om:0, lucky:0, ab:0, total:0 };
+            Object.keys(catNames).forEach(k => {
+                const d = window.allData[k];
+                const total = d.o + d.t + d.q, ab = d.a + d.b;
+                const rate = total > 0 ? ((ab / total) * 100).toFixed(1) : "0";
+                s.o += d.o; s.tq += (d.t + d.q); s.a += d.a; s.b += d.b; s.om += d.om; s.lucky += (d.lucky+d.super); s.ab += ab; s.total += total;
+                body.innerHTML += `<tr><td>${catNames[k]}</td><td>${d.o}</td><td>${d.t + d.q}</td><td>${d.a}</td><td>${d.b}</td><td>${d.om}</td><td>${d.lucky+d.super}</td><td style="color:#00e5ff;font-weight:bold">${ab}</td><td>${rate}%</td></tr>`;
+            });
+            const totalRate = s.total > 0 ? ((s.ab / s.total) * 100).toFixed(1) : "0";
+            document.getElementById('total_mastery').innerText = totalRate + "%";
+            foot.innerHTML = `<tr class="row-total"><td>TOTAL</td><td>${s.o}</td><td>${s.tq}</td><td>${s.a}</td><td>${s.b}</td><td>${s.om}</td><td>${s.lucky}</td><td>${s.ab}</td><td>${totalRate}%</td></tr>`;
+        }
+
+        function calculate() {
+            const d = window.allData[window.currentCat];
+            const total = d.o + d.t + d.q;
+            if (total === 0) return alert("データがありません");
+            document.getElementById('res_mastery').innerText = ((d.a + d.b) / total * 100).toFixed(1) + "%";
+            document.getElementById('report_area').style.display = 'block';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        function copyReport() {
+            const rate = document.getElementById('res_mastery').innerText;
+            const text = `【宅ラベ：${catNames[window.currentCat]}】\n実質正答率：${rate}\nメモ1：${window.allData[window.currentCat].notes || 'なし'}\nメモ2：${window.allData[window.currentCat].q_notes || 'なし'}`;
+            navigator.clipboard.writeText(text); alert("報告をコピーしました！");
+        }
+
+        function resetCurrent() {
+            if(confirm("リセットしますか？")) {
+                window.allData[window.currentCat] = createSet(); window.saveData(); window.updateUI();
+            }
+        }
+    </script>
+</body>
+</html>
     </script>
     </head>
