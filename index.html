@@ -11,35 +11,42 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <style>
-        body { font-family: sans-serif; background: #121212; color: #e0e0e0; padding: 10px; margin: 0; padding-bottom: 50px; }
+        body { font-family: sans-serif; background: #121212; color: #e0e0e0; padding: 10px; margin: 0; padding-bottom: 80px; }
         
-        .tab-container { display: flex; gap: 6px; margin-bottom: 15px; position: sticky; top: 0; z-index: 100; background: #121212; padding: 8px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .tab { background: #333; color: #aaa; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; transition: 0.2s; }
+        .tab-container { display: flex; gap: 6px; margin-bottom: 15px; position: sticky; top: 0; z-index: 100; background: #121212; padding: 8px 0; overflow-x: auto; }
+        .tab { background: #333; color: #aaa; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; white-space: nowrap; cursor: pointer; }
         .tab.active { background: #00e5ff; color: #000; }
 
-        .section-title { font-size: 0.85rem; color: #999; text-transform: uppercase; margin: 15px 0 6px 5px; border-left: 3px solid #00e5ff; padding-left: 10px; }
+        .section-title { font-size: 0.85rem; color: #999; margin: 15px 0 6px 5px; border-left: 3px solid #00e5ff; padding-left: 10px; }
         .card { background: #1e1e1e; padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
         .btn-container { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; }
-        .btn { border: none; border-radius: 10px; color: white; padding: 12px 5px; font-size: 0.85rem; font-weight: bold; cursor: pointer; width: 100%; -webkit-tap-highlight-color: transparent; }
-        .minus-btn { background: #444; color: #fff; border-radius: 50%; width: 28px; height: 28px; border: 2px solid #222; margin-top: -12px; z-index: 10; font-size: 18px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .btn { border: none; border-radius: 10px; color: white; padding: 12px 5px; font-size: 0.85rem; font-weight: bold; width: 100%; cursor: pointer; }
+        .minus-btn { background: #444; color: #fff; border-radius: 50%; width: 28px; height: 28px; border: 2px solid #222; margin-top: -12px; z-index: 10; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+        
         .btn-o { background: #2e7d32; } .btn-t { background: #ef6c00; } .btn-q { background: #c62828; }
         .btn-audit { background: #37474f; font-size: 0.75rem; }
-        .btn-om-large { background: #b71c1c; padding: 18px 5px; font-size: 1.05rem; }
-        .count-display { font-size: 1.15rem; display: block; margin-bottom: 2px; pointer-events: none; }
-        .alert { background: #37474f; color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; font-size: 0.85rem; text-align: center; }
-        .msg { background: #263238; padding: 12px; border-radius: 8px; font-size: 0.8rem; margin-top: 10px; color: #ffeb3b; white-space: pre-line; line-height: 1.4; }
-        .note-area { width: 100%; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; padding: 10px; box-sizing: border-box; font-size: 0.9rem; margin-top: 10px; resize: none; min-height: 70px; }
-        .report-btn { background: #007bff; width: 100%; margin-top: 20px; padding: 15px; font-size: 1rem; color: white; border: none; border-radius: 10px; font-weight: bold; }
-        .reset-btn { background: #333; width: 100%; margin-top: 15px; padding: 8px; font-size: 0.75rem; color: #777; border: none; border-radius: 8px; }
+        .count-display { font-size: 1.15rem; display: block; margin-bottom: 2px; }
+
+        .note-area { width: 100%; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; padding: 10px; box-sizing: border-box; font-size: 0.85rem; margin-top: 10px; min-height: 80px; }
+        
+        .dashboard-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
+        .dashboard-table th, .dashboard-table td { border-bottom: 1px solid #333; padding: 10px 5px; text-align: center; }
+        .dashboard-table th { color: #888; }
+        .highlight { color: #00e5ff; font-weight: bold; }
+
+        .report-btn { background: #007bff; width: 100%; margin-top: 15px; padding: 15px; font-size: 1rem; color: white; border: none; border-radius: 10px; font-weight: bold; }
+        .reset-btn { background: #222; width: 100%; margin-top: 20px; padding: 10px; font-size: 0.7rem; color: #555; border: none; }
         .stat-val { font-size: 2.2rem; color: #00e5ff; font-weight: bold; }
-        .label-desc { font-size: 0.6rem; font-weight: normal; opacity: 0.8; display: block; margin-top: 2px; }
     </style>
 </head>
 <body onload="init()">
 
     <div class="tab-container">
+        <button class="tab" onclick="switchTab('dash')">📊 ダッシュボード</button>
         <button class="tab" onclick="switchTab('total')">全範囲</button>
         <button class="tab" onclick="switchTab('rights')">権利関係</button>
         <button class="tab" onclick="switchTab('business')">宅建業法</button>
@@ -47,107 +54,75 @@
         <button class="tab" onclick="switchTab('tax')">税・その他</button>
     </div>
 
-    <div id="status_alert" class="alert">自分のペースで記録していきましょう</div>
-
-    <div class="section-title">PHASE 1: 演習中 (感触)</div>
-    <div class="card grid-3">
-        <div class="btn-container">
-            <button class="btn btn-o" onclick="inc('o')"><span class="count-display" id="o_v">0</span>○自信あり</button>
-            <div class="minus-btn" onclick="dec('o', event)">－</div>
-        </div>
-        <div class="btn-container">
-            <button class="btn btn-t" onclick="inc('t')"><span class="count-display" id="t_v">0</span>△確信無</button>
-            <div class="minus-btn" onclick="dec('t', event)">－</div>
-        </div>
-        <div class="btn-container">
-            <button class="btn btn-q" onclick="inc('q')"><span class="count-display" id="q_v">0</span>？？不明</button>
-            <div class="minus-btn" onclick="dec('q', event)">－</div>
-        </div>
-    </div>
-
-    <div class="section-title">PHASE 2: 結果内訳</div>
-    <div class="card">
-        <p style="font-size: 0.75rem; margin-bottom: 10px; color: #ff5252; font-weight: bold;">【○確信】だったのに外した「バグ」</p>
-        <div class="btn-container">
-            <button class="btn btn-om-large" onclick="inc('om')">
-                <span class="count-display" id="om_v">0</span>
-                ○ミス (ここが復習の宝庫です)
-            </button>
-            <div class="minus-btn" onclick="dec('om', event)">－</div>
-        </div>
-        <textarea id="om_notes" class="note-area" oninput="saveCurrent()" placeholder="次は間違えないように、理由をメモしておきましょう。"></textarea>
-    </div>
-
-    <div class="card grid-2">
-        <div class="btn-container">
-            <button class="btn btn-audit" onclick="inc('a')">
-                <span class="count-display" id="a_v">0</span>a (完勝)
-                <span class="label-desc">4肢すべての理由が判明</span>
-            </button>
-            <div class="minus-btn" onclick="dec('a', event)">－</div>
-        </div>
-        <div class="btn-container">
-            <button class="btn btn-audit" onclick="inc('b')">
-                <span class="count-display" id="b_v">0</span>b (一撃)
-                <span class="label-desc">消去法などで正解</span>
-            </button>
-            <div class="minus-btn" onclick="dec('b', event)">－</div>
+    <div id="view_dash" style="display:none;">
+        <div class="section-title">全分野の総合集計</div>
+        <div class="card" style="text-align:center;">
+            <div class="stat-val" id="total_mastery">0%</div>
+            <div style="color:#888; font-size: 0.85rem;">トータル実質正答率 (a+b)</div>
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>分野</th>
+                        <th>○自信</th>
+                        <th>△/？</th>
+                        <th>a+b</th>
+                        <th>率</th>
+                    </tr>
+                </thead>
+                <tbody id="dash_body">
+                    </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="card grid-2">
-        <div class="btn-container">
-            <button class="btn btn-audit" style="background:#283593;" onclick="inc('lucky')">
-                <span class="count-display" id="lucky_v">0</span>ラッキー(△○)
-            </button>
-            <div class="minus-btn" onclick="dec('lucky', event)">－</div>
+    <div id="view_input">
+        <div id="status_alert" class="card" style="background:#37474f; text-align:center; padding:10px; font-weight:bold; font-size:0.8rem;">
+            カテゴリを選択してください
         </div>
-        <div class="btn-container">
-            <button class="btn btn-audit" style="background:#4527a0;" onclick="inc('super')">
-                <span class="count-display" id="super_v">0</span>超ラッキー(?○)
-            </button>
-            <div class="minus-btn" onclick="dec('super', event)">－</div>
-        </div>
-        <div class="btn-container">
-            <button class="btn btn-audit" onclick="inc('valid_x')">
-                <span class="count-display" id="valid_x_v">0</span>実力ミス(△×)
-            </button>
-            <div class="minus-btn" onclick="dec('valid_x', event)">－</div>
-        </div>
-        <div class="btn-container">
-            <button class="btn btn-audit" onclick="inc('growth')">
-                <span class="count-display" id="growth_v">0</span>伸び代(?×)
-            </button>
-            <div class="minus-btn" onclick="dec('growth', event)">－</div>
-        </div>
-        <div id="feedback_msg" class="msg" style="display:none; grid-column: span 2;"></div>
-    </div>
 
-    <button class="report-btn" onclick="calculate()">分析結果を表示する</button>
-    <button class="reset-btn" onclick="resetCurrent()">表示中のカテゴリをリセット</button>
+        <div class="section-title">PHASE 1: 演習中の感触</div>
+        <div class="card grid-3">
+            <div class="btn-container"><button class="btn btn-o" onclick="inc('o')"><span class="count-display" id="o_v">0</span>○自信あり</button><div class="minus-btn" onclick="dec('o', event)">－</div></div>
+            <div class="btn-container"><button class="btn btn-t" onclick="inc('t')"><span class="count-display" id="t_v">0</span>△確信無し</button><div class="minus-btn" onclick="dec('t', event)">－</div></div>
+            <div class="btn-container"><button class="btn btn-q" onclick="inc('q')"><span class="count-display" id="q_v">0</span>？？不明</button><div class="minus-btn" onclick="dec('q', event)">－</div></div>
+        </div>
 
-    <div id="report_area" class="card" style="display:none; text-align: center; border-top: 3px solid #00e5ff;">
-        <div id="cat_name" style="color:#00e5ff; font-weight:bold; margin-bottom:10px;">分野</div>
-        <div class="stat-val" id="gap_res">0%</div>
-        <div style="color:#888; font-size: 0.85rem; margin-bottom: 10px;">ギャップ率 (脳のズレ)</div>
-        <div class="stat-val" id="mastery_res" style="color:#4caf50;">0%</div>
-        <div style="color:#888; font-size: 0.85rem; margin-bottom: 15px;">実質正答率 (a+b)</div>
-        <button class="report-btn" style="background: #00e5ff; color: #000;" onclick="copyReport()">報告をコピーする</button>
+        <div class="section-title">PHASE 2: 結果の格付け</div>
+        <div class="card grid-2">
+            <div class="btn-container"><button class="btn btn-audit" style="background:#b71c1c;" onclick="inc('om')"><span class="count-display" id="om_v">0</span>○ミス</button><div class="minus-btn" onclick="dec('om', event)">－</div></div>
+            <div class="btn-container"><button class="btn btn-audit" onclick="inc('a')"><span class="count-display" id="a_v">0</span>a (完勝)</button><div class="minus-btn" onclick="dec('a', event)">－</div></div>
+            <div class="btn-container"><button class="btn btn-audit" onclick="inc('b')"><span class="count-display" id="b_v">0</span>b (一撃)</button><div class="minus-btn" onclick="dec('b', event)">－</div></div>
+            <div class="btn-container"><button class="btn btn-audit" style="background:#283593;" onclick="inc('lucky')"><span class="count-display" id="lucky_v">0</span>ラッキー</button><div class="minus-btn" onclick="dec('lucky', event)">－</div></div>
+        </div>
+
+        <div class="section-title">学習メモ (自由記述)</div>
+        <div class="card">
+            <textarea id="cat_notes" class="note-area" oninput="saveCurrent()" placeholder="「この判例忘れてた」「△だけど正解した理由」など自由にメモしてください。"></textarea>
+        </div>
+
+        <button class="report-btn" onclick="calculate()">分野別の分析結果</button>
+
+        <div id="report_area" class="card" style="display:none; text-align: center; border-top: 3px solid #00e5ff;">
+            <div id="report_name" style="color:#00e5ff; font-weight:bold; margin-bottom:10px;">分野名</div>
+            <div class="stat-val" id="res_mastery">0%</div>
+            <div style="color:#888; font-size: 0.85rem;">実質正答率 (a+b)</div>
+            <button class="report-btn" style="background: #00e5ff; color: #000;" onclick="copyReport()">報告をコピー</button>
+        </div>
+        
+        <button class="reset-btn" onclick="resetCurrent()">このカテゴリをリセット</button>
     </div>
 
     <script>
         let currentCat = 'total';
-        const catNames = { total: '全範囲', rights: '権利関係', business: '宅建業法', laws: '法令上の制限', tax: '税・その他' };
-        let allData = {
-            total: createSet(), rights: createSet(), business: createSet(), laws: createSet(), tax: createSet()
-        };
+        const catNames = { total:'全範囲', rights:'権利関係', business:'宅建業法', laws:'法令上の制限', tax:'税・その他' };
+        let allData = { total:createSet(), rights:createSet(), business:createSet(), laws:createSet(), tax:createSet() };
 
         function createSet() { return { o:0, t:0, q:0, a:0, b:0, om:0, lucky:0, super:0, valid_x:0, growth:0, notes: "" }; }
 
         function init() {
-            const saved = localStorage.getItem('takulabe_v61_data');
+            const saved = localStorage.getItem('takulabe_v7_data');
             if (saved) allData = JSON.parse(saved);
-            switchTab('total');
+            switchTab('dash');
         }
 
         function switchTab(cat) {
@@ -155,15 +130,25 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             const activeTab = document.querySelector(`[onclick="switchTab('${cat}')"]`);
             if (activeTab) activeTab.classList.add('active');
-            
-            document.getElementById('om_notes').value = allData[cat].notes || "";
-            document.getElementById('report_area').style.display = 'none';
-            updateUI();
+
+            if (cat === 'dash') {
+                document.getElementById('view_dash').style.display = 'block';
+                document.getElementById('view_input').style.display = 'none';
+                renderDashboard();
+            } else {
+                document.getElementById('view_dash').style.display = 'none';
+                document.getElementById('view_input').style.display = 'block';
+                document.getElementById('cat_notes').value = allData[cat].notes || "";
+                document.getElementById('report_area').style.display = 'none';
+                updateUI();
+            }
         }
 
         function saveCurrent() {
-            allData[currentCat].notes = document.getElementById('om_notes').value;
-            localStorage.setItem('takulabe_v61_data', JSON.stringify(allData));
+            if (currentCat !== 'dash') {
+                allData[currentCat].notes = document.getElementById('cat_notes').value;
+            }
+            localStorage.setItem('takulabe_v7_data', JSON.stringify(allData));
         }
 
         function inc(k) { allData[currentCat][k]++; updateUI(); saveCurrent(); }
@@ -171,71 +156,63 @@
 
         function updateUI() {
             const data = allData[currentCat];
-            Object.keys(data).forEach(k => {
-                const el = document.getElementById(k+'_v');
-                if(el) el.innerText = data[k];
+            Object.keys(data).forEach(k => { const el = document.getElementById(k+'_v'); if(el) el.innerText = data[k]; });
+            document.getElementById('status_alert').innerText = `【${catNames[currentCat]}】を記録中`;
+        }
+
+        function renderDashboard() {
+            const body = document.getElementById('dash_body');
+            body.innerHTML = "";
+            let grandAB = 0;
+            let grandTotal = 0;
+
+            Object.keys(catNames).forEach(key => {
+                const d = allData[key];
+                const total = d.o + d.t + d.q;
+                const ab = d.a + d.b;
+                const rate = total > 0 ? ((ab / total) * 100).toFixed(1) : 0;
+                
+                grandAB += ab;
+                grandTotal += total;
+
+                const row = `<tr>
+                    <td>${catNames[key]}</td>
+                    <td>${d.o}</td>
+                    <td>${d.t + d.q}</td>
+                    <td class="highlight">${ab}</td>
+                    <td>${rate}%</td>
+                </tr>`;
+                body.innerHTML += row;
             });
 
-            let t1 = data.o + data.t + data.q;
-            let t2 = data.a + data.b + data.om + data.lucky + data.super + data.valid_x + data.growth;
-            let alertBox = document.getElementById('status_alert');
-            let fbBox = document.getElementById('feedback_msg');
-
-            if (t1 === 0) { 
-                alertBox.innerText = `【${catNames[currentCat]}】演習を開始しましょう！`; 
-                alertBox.style.background = "#37474f"; 
-            } else if (t1 > t2) { 
-                alertBox.innerText = `内訳があと ${t1 - t2} 件残っています`; 
-                alertBox.style.background = "#ef6c00"; 
-            } else if (t1 < t2) { 
-                alertBox.innerText = `内訳が ${t2 - t1} 件多く入力されています`; 
-                alertBox.style.background = "#b71c1c"; 
-            } else { 
-                alertBox.innerText = `【${catNames[currentCat]}】全件入力済みです`; 
-                alertBox.style.background = "#2e7d32"; 
-            }
-
-            let msgs = [];
-            if (data.super > 0) msgs.push("？→○：ラッキーを実力に変えるチャンスです！");
-            if (data.growth > 0 || data.valid_x > 0) msgs.push("×：ここは伸び代。一つずつ知識を固めましょう！");
-            fbBox.style.display = msgs.length > 0 ? "block" : "none";
-            fbBox.innerText = msgs.join("\n");
+            const totalRate = grandTotal > 0 ? ((grandAB / grandTotal) * 100).toFixed(1) : 0;
+            document.getElementById('total_mastery').innerText = totalRate + "%";
         }
 
         function calculate() {
-            const data = allData[currentCat];
-            let total = data.o + data.t + data.q;
-            if (total === 0 || total !== (data.a + data.b + data.om + data.lucky + data.super + data.valid_x + data.growth)) {
-                return alert("入力件数を確認してください。");
-            }
-            let gap = ((data.om + data.lucky + data.super) / total * 100).toFixed(1);
-            let mastery = ((data.a + data.b) / total * 100).toFixed(1);
-
-            document.getElementById('cat_name').innerText = catNames[currentCat];
-            document.getElementById('gap_res').innerText = gap + "%";
-            document.getElementById('mastery_res').innerText = mastery + "%";
+            const d = allData[currentCat];
+            const total = d.o + d.t + d.q;
+            if (total === 0) return alert("データがありません");
+            const rate = ((d.a + d.b) / total * 100).toFixed(1);
+            document.getElementById('report_name').innerText = catNames[currentCat];
+            document.getElementById('res_mastery').innerText = rate + "%";
             document.getElementById('report_area').style.display = 'block';
             window.scrollTo(0, document.body.scrollHeight);
         }
 
-        function resetCurrent() {
-            if(confirm(`${catNames[currentCat]}のデータをリセットしてもよろしいですか？`)) {
-                allData[currentCat] = createSet();
-                document.getElementById('om_notes').value = "";
-                saveCurrent();
-                updateUI();
-                document.getElementById('report_area').style.display = 'none';
-            }
+        function copyReport() {
+            const rate = document.getElementById('res_mastery').innerText;
+            const text = `【宅ラベ：${catNames[currentCat]}】\n実質正答率：${rate}\n\nメモ：\n${allData[currentCat].notes || 'なし'}`;
+            navigator.clipboard.writeText(text);
+            alert("コピー完了！");
         }
 
-        function copyReport() {
-            const data = allData[currentCat];
-            const gap = document.getElementById('gap_res').innerText;
-            const mastery = document.getElementById('mastery_res').innerText;
-            const notes = document.getElementById('om_notes').value;
-            let text = `【宅ラベ：${catNames[currentCat]}】\nギャップ率：${gap}\n実質正答率：${mastery}\n\n【復習メモ】\n${notes || 'なし'}`;
-            navigator.clipboard.writeText(text);
-            alert(`${catNames[currentCat]}の報告をコピーしました。山口さんに共有しましょう！`);
+        function resetCurrent() {
+            if(confirm("このカテゴリのデータをリセットしますか？")) {
+                allData[currentCat] = createSet();
+                saveCurrent();
+                switchTab(currentCat);
+            }
         }
     </script>
 </body>
