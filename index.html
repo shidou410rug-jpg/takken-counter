@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>宅ラベ Ver.9.2</title>
+    <title>宅ラベ Ver.9.3</title>
     <meta name="apple-mobile-web-app-title" content="宅ラベ">
     <link rel="apple-touch-icon" href="IMG_2202.png">
     <link rel="icon" type="image/png" href="IMG_2202.png">
@@ -30,19 +30,12 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        window.allData = {
-            total: createSet(), rights: createSet(), business: createSet(), laws: createSet(), tax: createSet()
-        };
-
+        // データの初期化
+        window.allData = { total: createSet(), rights: createSet(), business: createSet(), laws: createSet(), tax: createSet() };
         function createSet() { return { o:0, t:0, q:0, a:0, b:0, om:0, lucky:0, super:0, valid_x:0, growth:0, notes: "", q_notes: "" }; }
 
-        // ログイン診断
-        getRedirectResult(auth).catch((error) => {
-            if(error.code !== 'auth/redirect-cancelled-by-user') {
-                alert("ログイン診断: " + error.code + "\n" + error.message);
-            }
-        });
-
+        // ログイン処理
+        getRedirectResult(auth).catch(err => { if(err.code !== 'auth/redirect-cancelled-by-user') console.error(err); });
         onAuthStateChanged(auth, async (user) => {
             const status = document.getElementById('user_status');
             if (user) {
@@ -58,37 +51,22 @@
             }
         });
 
+        // --- 全関数をwindowに紐付け（これで絶対反応するようになります） ---
         window.login = () => signInWithRedirect(auth, provider);
         window.logout = () => signOut(auth).then(() => location.reload());
-
         window.saveData = async () => {
-            localStorage.setItem('takulabe_v92_storage', JSON.stringify(window.allData));
+            localStorage.setItem('takulabe_v93_storage', JSON.stringify(window.allData));
             const user = auth.currentUser;
-            if (user) {
-                try { await setDoc(doc(db, "users", user.uid), { allData: window.allData, lastUpdated: new Date() }); } catch(e) { console.error(e); }
-            }
+            if (user) { try { await setDoc(doc(db, "users", user.uid), { allData: window.allData, lastUpdated: new Date() }); } catch(e) { console.error(e); } }
         };
 
-        function loadFromLocal() {
-            const saved = localStorage.getItem('takulabe_v92_storage');
-            if (saved) window.allData = JSON.parse(saved);
-            window.updateUI();
-        }
-
-        async function loadFromServer(uid) {
-            const docSnap = await getDoc(doc(db, "users", uid));
-            if (docSnap.exists()) { window.allData = docSnap.data().allData; } else { loadFromLocal(); }
-            window.updateUI();
-        }
-
-        // --- UIロジック ---
         window.currentCat = 'dash';
         const catNames = { total:'全範囲', rights:'権利関係', business:'宅建業法', laws:'法令上の制限', tax:'税・その他' };
 
         window.switchTab = (cat) => {
             window.currentCat = cat;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            const activeTab = document.querySelector(`[onclick="switchTab('${cat}')"]`);
+            const activeTab = document.querySelector(`[onclick*="'${cat}'"]`);
             if (activeTab) activeTab.classList.add('active');
             
             if (cat === 'dash') {
@@ -163,11 +141,13 @@
             navigator.clipboard.writeText(text); alert("報告をコピーしました！");
         };
 
-        window.resetCurrent = () => {
-            if(confirm("リセットしますか？")) { window.allData[window.currentCat] = createSet(); window.saveData(); window.updateUI(); }
-        };
+        window.resetCurrent = () => { if(confirm("リセットしますか？")) { window.allData[window.currentCat] = createSet(); window.saveData(); window.updateUI(); } };
 
-        window.onload = () => { switchTab('dash'); };
+        function loadFromLocal() { const saved = localStorage.getItem('takulabe_v93_storage'); if (saved) window.allData = JSON.parse(saved); window.updateUI(); }
+        async function loadFromServer(uid) { const docSnap = await getDoc(doc(db, "users", uid)); if (docSnap.exists()) { window.allData = docSnap.data().allData; } else { loadFromLocal(); } window.updateUI(); }
+
+        // 初回起動
+        window.switchTab('dash');
     </script>
 
     <style>
@@ -232,22 +212,16 @@
 
     <div id="view_input" style="display:none;">
         <div id="status_alert" class="status-bar status-neutral">演習開始！</div>
-        
         <div class="section-title">PHASE 1: 演習中の感触</div>
         <div class="card grid-3">
             <div class="btn-container"><button class="btn btn-o" onclick="inc('o')"><span id="o_v" class="count-display">0</span>○自信</button><div class="minus-btn" onclick="dec('o', event)">－</div></div>
             <div class="btn-container"><button class="btn btn-t" onclick="inc('t')"><span id="t_v" class="count-display">0</span>△迷い</button><div class="minus-btn" onclick="dec('t', event)">－</div></div>
             <div class="btn-container"><button class="btn btn-q" onclick="inc('q')"><span id="q_v" class="count-display">0</span>？？不明</button><div class="minus-btn" onclick="dec('q', event)">－</div></div>
         </div>
-
         <div class="section-title">PHASE 2: 結果内訳</div>
         <div class="card">
-            <div class="btn-container" style="margin-bottom:20px;">
-                <button class="btn btn-audit" style="background:#b71c1c; padding:30px 5px;" onclick="inc('om')"><span id="om_v" class="count-display">0</span>○ミス（致命的バグ）</button>
-                <div class="minus-btn" onclick="dec('om', event)">－</div>
-            </div>
+            <div class="btn-container" style="margin-bottom:20px;"><button class="btn btn-audit" style="background:#b71c1c; padding:30px 5px;" onclick="inc('om')"><span id="om_v" class="count-display">0</span>○ミス（要復習バグ）</button><div class="minus-btn" onclick="dec('om', event)">－</div></div>
             <textarea id="cat_notes" class="note-area" oninput="saveNotes()" placeholder="○ミスの理由を即メモ！"></textarea>
-            
             <div class="grid-2" style="margin-top:35px;">
                 <div class="btn-container"><button class="btn btn-audit" onclick="inc('a')"><span id="a_v" class="count-display">0</span>a(完勝)</button><div class="minus-btn" onclick="dec('a', event)">－</div></div>
                 <div class="btn-container"><button class="btn btn-audit" onclick="inc('b')"><span id="b_v" class="count-display">0</span>b(一撃)</button><div class="minus-btn" onclick="dec('b', event)">－</div></div>
@@ -256,4 +230,14 @@
                 <div class="btn-container"><button class="btn btn-audit" onclick="inc('valid_x')"><span id="valid_x_v" class="count-display">0</span>△×(実力)</button><div class="minus-btn" onclick="dec('valid_x', event)">－</div></div>
                 <div class="btn-container"><button class="btn btn-audit" onclick="inc('growth')"><span id="growth_v" class="count-display">0</span>?×(伸び代)</button><div class="minus-btn" onclick="dec('growth', event)">－</div></div>
             </div>
-            <textarea id="q_notes" class="note-area" oninput="saveNotes()" placeholder="？
+            <textarea id="q_notes" class="note-area" oninput="saveNotes()" placeholder="？不明や伸び代についての気づきメモ"></textarea>
+        </div>
+        <button class="report-btn" onclick="calculate()">分析結果を表示</button>
+        <div id="report_area" class="card" style="display:none; text-align: center; border-top: 8px solid #00e5ff;">
+            <div class="stat-val" id="res_mastery">0%</div>
+            <button class="report-btn" style="background:#00e5ff; color:#000;" onclick="copyReport()">報告をコピー</button>
+        </div>
+        <button onclick="resetCurrent()" style="background:none; border:none; color:#555; width:100%; margin-top:40px; font-size:0.85rem;">表示中のカテゴリをリセット</button>
+    </div>
+</body>
+</html>
